@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multi-Currency & Crypto Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { background: #0c0c3c; color: white; }
+    .jumbotron-full {
+      height: 100vh;
+      background: url('https://images.unsplash.com/photo-1640826514546-7d2eab70a4e5?fm=jpg&q=60&w=3000') center/cover no-repeat;
+    }
+    .container-custom {
+      background: #012a63;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px black;
+      margin: 10px;
+      flex: 1;
+    }
+    canvas { background: #fff; padding: 10px; border-radius: 5px; }
+    .flex-row { display: flex; flex-wrap: wrap; justify-content: space-around; }
+    footer {
+      background: linear-gradient(90deg, #001f3f, #012a63);
+      padding: 30px;
+      text-align: center;
+      margin-top: 40px;
+      color: #ddd;
+    }
+    footer p { margin: 5px; }
+  </style>
+</head>
+<body>
+
+  <div class="jumbotron-full d-flex align-items-center justify-content-center">
+    <div class="text-center text-white px-3">
+      <img src="pngegg.png" alt="Dashboard Logo" style="width:220px; margin-bottom:20px;">
+      <h2 class="mb-4" style="color: #ffd700; text-shadow: 0 0 4px #222, 0 0 8px #ffd700;">EX ETHIOPIA</h2>
+      <h1 class="display-4 fw-bold" style="color: #ffd700; text-shadow: 0 0 8px #222, 0 0 16px #ffd700;">Track Global Exchange & Crypto Prices</h1>
+      <p class="lead" style="color: #ffd700; text-shadow: 0 0 4px #222;">All your currency & crypto data in one place!</p>
+    </div>
+  </div>
+
+  <!-- CURRENCY SECTION -->
+  <div class="flex-row">
+    <div class="container-custom">
+      <h2 class="text-center">Exchange Rates</h2>
+      <select id="base-currency" class="form-select mb-2">
+        <option value="USD">USD</option><option value="EUR">EUR</option>
+        <option value="GBP">GBP</option><option value="JPY">JPY</option>
+        <option value="AUD">AUD</option><option value="CAD">CAD</option>
+        <option value="ETB">ETB</option>
+      </select>
+      <button id="fetch-rates" class="btn btn-primary w-100 mb-2">Fetch Rates</button>
+      <table class="table table-dark table-striped">
+        <thead><tr><th>Currency</th><th>Rate</th></tr></thead>
+        <tbody id="rates-table"></tbody>
+      </table>
+    </div>
+
+    <div class="container-custom">
+      <h2 class="text-center">Currency Calculator</h2>
+      <input id="calc-amount" type="number" class="form-control mb-2" placeholder="Amount">
+      <select id="calc-currency" class="form-select mb-2"></select>
+      <button id="convert-currency" class="btn btn-success w-100">Convert</button>
+      <p id="calc-result" class="mt-3 text-center fs-5"></p>
+    </div>
+
+    <div class="container-custom">
+      <h2 class="text-center">Currency Graph</h2>
+      <canvas id="currency-chart"></canvas>
+    </div>
+  </div>
+
+  <!-- CRYPTO SECTION -->
+  <div class="container-custom text-center">
+    <h2>Crypto Prices & Chart Controls</h2>
+    <div class="btn-group mb-3">
+      <button class="btn btn-outline-light btn-sm" onclick="loadCrypto('bitcoin')">BTC</button>
+      <button class="btn btn-outline-light btn-sm" onclick="loadCrypto('ethereum')">ETH</button>
+      <button class="btn btn-outline-light btn-sm" onclick="loadCrypto('solana')">SOL</button>
+      <button class="btn btn-outline-light btn-sm" onclick="loadCrypto('cardano')">ADA</button>
+      <button class="btn btn-outline-light btn-sm" onclick="loadCrypto('binancecoin')">BNB</button>
+    </div>
+    <canvas id="crypto-chart"></canvas>
+  </div>
+
+  <div class="flex-row">
+    <div class="container-custom">
+      <h2 class="text-center">Live Crypto Prices</h2>
+      <table class="table table-dark table-striped">
+        <thead><tr><th>Crypto</th><th>USD Price</th></tr></thead>
+        <tbody id="crypto-table"></tbody>
+      </table>
+    </div>
+
+    <div class="container-custom">
+      <h2 class="text-center">Crypto Calculator</h2>
+      <input id="usd-input" type="number" class="form-control mb-2" placeholder="USD Amount">
+      <select id="crypto-select" class="form-select mb-2"></select>
+      <button id="convert-crypto" class="btn btn-success w-100">Convert to Crypto</button>
+      <p id="crypto-result" class="mt-3 text-center fs-5"></p>
+    </div>
+  </div>
+
+  <!-- NEWS & LINK SECTION -->
+  <div class="flex-row">
+    <div class="container-custom">
+      <h2 class="text-center">bitcoin the king of cryptocurrency</h2>
+      <ul id="news-list"></ul>
+      <img src="https://coindoo.com/wp-content/uploads/2025/04/bitcoin-hand-redline.webp" alt="News Image" class="img-fluid mt-3 rounded">
+    </div>
+    <div class="container-custom text-center">
+      <h2>Click here to know about the parallel exchange</h2>
+      <div style="position:relative; display:inline-block;">
+      <img src="https://www.addisinsight.net/wp-content/uploads/2024/09/Black-Market.jpg" alt="Ethioblackmarket Logo" class="img-fluid rounded" style="max-width:700px;">
+      <a class="btn btn-warning mt-4" href="https://www.ethioblackmarket.com" target="_blank"
+         style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);">
+        black market ethiopia
+      </a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <p class="mb-1">© 2025 Multi-Currency & Crypto Dashboard</p>
+      <p class="mb-0">Powered by Bootstrap, Chart.js, and CoinGecko API</p>
+      <p class="mb-0">Developed in Addis Ababa, Ethiopia</p>
+    </div>
+  </footer>
+
+  <script>
+    // --- Currency Rates ---
+    let currencyRates = {}, currentBase = 'USD';
+    const baseSel = document.getElementById('base-currency'),
+      fetchRates = document.getElementById('fetch-rates'),
+      ratesTable = document.getElementById('rates-table'),
+      chartCtx = document.getElementById('currency-chart').getContext('2d'),
+      convertBtn = document.getElementById('convert-currency'),
+      currCalcSel = document.getElementById('calc-currency'),
+      calcRes = document.getElementById('calc-result');
+    let currChart;
+
+    fetchRates.addEventListener('click', async () => {
+      currentBase = baseSel.value;
+      const data = await (await fetch(`https://open.er-api.com/v6/latest/${currentBase}`)).json();
+      currencyRates = data.rates;
+      const keys = ['USD','EUR','GBP','JPY','AUD','CAD','ETB'];
+      ratesTable.innerHTML = '';
+      currCalcSel.innerHTML = '';
+      keys.forEach(k => {
+        if (currencyRates[k]) {
+          ratesTable.innerHTML += `<tr><td>${k}</td><td>${currencyRates[k]}</td></tr>`;
+          currCalcSel.innerHTML += `<option value="${k}">${k}</option>`;
+        }
+      });
+      if (currChart) currChart.destroy();
+      currChart = new Chart(chartCtx, {
+        type: 'line',
+        data: {
+          labels: keys.filter(k=>currencyRates[k]),
+          datasets:[{
+            label:`Rates vs ${currentBase}`,
+            data:keys.filter(k=>currencyRates[k]).map(k=>currencyRates[k]),
+            borderColor: 'rgba(0,123,255,1)',
+            backgroundColor: 'rgba(0,123,255,0.3)',
+            fill: true
+          }]
+        },
+        options:{scales:{y:{beginAtZero:true}}}
+      });
+    });
+
+    convertBtn.addEventListener('click', () => {
+      const amt = parseFloat(document.getElementById('calc-amount').value);
+      const toCur = currCalcSel.value;
+      if (!amt || !currencyRates[toCur]) return calcRes.textContent = 'Enter valid amount & fetch rates.';
+      calcRes.textContent = `${amt} ${currentBase} = ${(amt*currencyRates[toCur]).toFixed(4)} ${toCur}`;
+    });
+
+    // --- Crypto Section ---
+    const cryptoTable = document.getElementById('crypto-table'),
+      usdInput = document.getElementById('usd-input'),
+      cryptSel = document.getElementById('crypto-select'),
+      convCryptoBtn = document.getElementById('convert-crypto'),
+      cryptoRes = document.getElementById('crypto-result'),
+      cryptoCtx = document.getElementById('crypto-chart').getContext('2d');
+    let cryptoData = {}, cryptoChart;
+
+    async function refreshCrypto() {
+      const d = await (await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,cardano,binancecoin&vs_currencies=usd')).json();
+      cryptoData = {
+        Bitcoin: d.bitcoin.usd, Ethereum: d.ethereum.usd,
+        Solana: d.solana.usd, Cardano: d.cardano.usd,
+        BNB: d.binancecoin.usd
+      };
+      cryptoTable.innerHTML = ''; cryptSel.innerHTML = '';
+      for(const [k,v] of Object.entries(cryptoData)) {
+        cryptoTable.innerHTML += `<tr><td>${k}</td><td>$${v}</td></tr>`;
+        cryptSel.innerHTML += `<option value="${k}">${k}</option>`;
+      }
+    }
+
+    convCryptoBtn.addEventListener('click', ()=>{
+      const usd = parseFloat(usdInput.value), cur = cryptSel.value;
+      if (!usd || !cryptoData[cur]) return cryptoRes.textContent = 'Enter USD & refresh prices.';
+      cryptoRes.textContent = `$${usd} = ${(usd/cryptoData[cur]).toFixed(6)} ${cur}`;
+    });
+
+    window.loadCrypto = async coin => {
+      const d = await (await fetch(`https://api.coingecko.com/api/v3/coins/${coin}/market_chart?vs_currency=usd&days=7`)).json();
+      const lbls = d.prices.map(p=>new Date(p[0]).toLocaleDateString());
+      const prs = d.prices.map(p=>p[1]);
+      if (cryptoChart) cryptoChart.destroy();
+      cryptoChart = new Chart(cryptoCtx,{
+        type:'line', data:{ labels: lbls, datasets:[{
+          label: coin.toUpperCase(), data: prs,
+          borderColor:'rgba(255,205,86,1)', backgroundColor:'rgba(255,205,86,0.3)', fill:true
+        }]}
+      });
+    };
+
+    
+
+    // Initialize
+    refreshCrypto();
+    loadCrypto('bitcoin');
+    loadNews();
+
+  </script>
+</body>
+</html>
